@@ -1,20 +1,22 @@
-import "./style.css";
+import './style.css';
 
 function createInputValue(validators) {
     return {
         value: '',
-    valid: false,
-    validators,
+        valid: false,
+        validators,
 
-    validate() {
-        this.valid = this.validators.every(validator => validator(this.value));
-        return this.valid;
-    },
+        validate() {
+            this.valid = this.validators.every((validator) =>
+                validator(this.value),
+            );
+            return this.valid;
+        },
 
-    setValue(value) {
-        this.value = value;
-        this.validate();
-    }   
+        setValue(value) {
+            this.value = value;
+            this.validate();
+        },
     };
 }
 
@@ -42,65 +44,101 @@ function createSubmitButton(text, onClick) {
     submitBtn.textContent = text;
     submitBtn.type = 'submit';
     submitBtn.addEventListener('click', onClick);
-    
+
     return submitBtn;
 }
 
-function createInputContainer(labelText, inputID, inputType, required, placeholder, validators) {
+function createInputContainer(
+    labelText,
+    inputID,
+    inputType,
+    required,
+    placeholder,
+    validators,
+) {
     const container = document.createElement('div');
     const label = createLabel(labelText, inputID);
-    const inputField = createInputField(inputType, inputID, required, placeholder);
-    
+    const inputField = createInputField(
+        inputType,
+        inputID,
+        required,
+        placeholder,
+    );
+
     inputField.addEventListener('blur', () => {
         const emailValue = createInputValue(validators);
         emailValue.setValue(inputField.value);
         inputField.classList.toggle('error', !emailValue.valid);
     });
     container.append(label, inputField);
-    return container
+    return container;
 }
 
 function createForm() {
     const form = document.createElement('form');
     form.setAttribute('novalidate', 'true');
     const emailValidators = [
-        value => value.includes('@'),
-        value => value.length >= 5,
+        (value) => value.includes('@'),
+        (value) => value.length >= 5,
     ];
-    const emailField = createInputContainer('E-Mail', 'userMail', "email", true, "user@example.com", emailValidators);
+    const emailField = createInputContainer(
+        'E-Mail',
+        'userMail',
+        'email',
+        true,
+        'user@example.com',
+        emailValidators,
+    );
 
-    const countryValidators = [
-        value => value.length >= 3,
-    ];
-    const countryField = createInputContainer("Country", "userCountry", "text", true, "E.g. United States", countryValidators);
+    const countryValidators = [(value) => value.length >= 3];
+    const countryField = createInputContainer(
+        'Country',
+        'userCountry',
+        'text',
+        true,
+        'E.g. United States',
+        countryValidators,
+    );
 
-    const zipCodeValidators = [
-        value => /^\d{5}(-\d{4})?$/.test(value),
-    ]
-    const zipCodeField = createInputContainer('ZIP Code', 'userZipCode', "text", true, "E.g. 20500", zipCodeValidators)
+    const zipCodeValidators = [(value) => /^\d{5}(-\d{4})?$/.test(value)];
+    const zipCodeField = createInputContainer(
+        'ZIP Code',
+        'userZipCode',
+        'text',
+        true,
+        'E.g. 20500',
+        zipCodeValidators,
+    );
 
     const passwordValidators = [
-        value => value.length >= 8,
-        value => /[A-Z]/.test(value),
-        value => /[0-9]/.test(value),
-    ]
-    const passwordField = createInputContainer('Password', 'userPassword', "password", true, "Your password", passwordValidators);
-    const submitBtn = createSubmitButton("Submit", () => {
-        console.log("Clicked!");
-    })
+        (value) => value.length >= 8,
+        (value) => /[A-Z]/.test(value),
+        (value) => /[0-9]/.test(value),
+    ];
+    const passwordField = createInputContainer(
+        'Password',
+        'userPassword',
+        'password',
+        true,
+        'Your password',
+        passwordValidators,
+    );
+    const submitBtn = createSubmitButton('Submit', () => {
+        console.log('Clicked!');
+    });
     form.append(
-        emailField, 
-        countryField, 
-        zipCodeField, 
-        passwordField, 
-        submitBtn
+        emailField,
+        countryField,
+        zipCodeField,
+        passwordField,
+        submitBtn,
     );
     form.addEventListener('submit', (event) => {
         event.preventDefault();
-    })
+    });
     return form;
 }
 
-const mainContainer = document.querySelector("div");
+const mainContainer = document.querySelector('div');
 const form = createForm();
 mainContainer.append(form);
