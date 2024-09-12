@@ -1,5 +1,7 @@
 import './style.css';
 
+const validatorsMap = new Map();
+
 function createInputValue(validators) {
     return {
         value: '',
@@ -64,6 +66,7 @@ function createInputContainer(
         required,
         placeholder,
     );
+    validatorsMap.set(inputField, validators);
 
     inputField.addEventListener('blur', () => {
         const emailValue = createInputValue(validators);
@@ -123,8 +126,24 @@ function createForm() {
         'Your password',
         passwordValidators,
     );
-    const submitBtn = createSubmitButton('Submit', () => {
-        console.log('Clicked!');
+    const submitBtn = createSubmitButton('Submit', (event) => {
+        event.preventDefault();
+        const inputs = form.querySelectorAll('input');
+        let allValid = true;
+        inputs.forEach((input) => {
+            const validators = validatorsMap.get(input);
+            const inputValue = createInputValue(validators);
+            inputValue.setValue(input.value);
+            input.classList.toggle('error', !inputValue.valid);
+            if (!inputValue.valid) {
+                allValid = false;
+            }
+        });
+        if (allValid) {
+            console.log('Form is valid!');
+        } else {
+            console.log('Form is invalid!');
+        }
     });
     form.append(
         emailField,
